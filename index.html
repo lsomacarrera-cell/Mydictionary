@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VocabPop · Inglés ↔ Español</title>
+  <title>My dictionary · Inglés ↔ Español</title>
 
   <!-- Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -49,7 +49,7 @@
         </div>
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            VocabPop <span class="text-slate-600 font-bold">· Inglés ↔ Español</span>
+            My dictionary <span class="text-slate-600 font-bold">· Inglés ↔ Español</span>
           </h1>
           <p class="text-slate-700">
             Guarda, busca, edita y exporta tu vocabulario. Modernito, rápido y sin dramas.
@@ -197,7 +197,7 @@
     // -----------------------------
     // Storage + Helpers
     // -----------------------------
-    const STORAGE_KEY = "vocabpop_words_v1";
+    const STORAGE_KEY = "My dictionary_words_v1";
 
     function cryptoId() {
       if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -407,7 +407,7 @@
     // -----------------------------
     exportBtn.addEventListener("click", () => {
       const payload = {
-        app: "vocabpop",
+        app: "My dictionary",
         version: 1,
         exportedAt: new Date().toISOString(),
         words
@@ -418,7 +418,7 @@
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "vocabpop_export.json";
+      a.download = "My dictionary_export.json";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -545,5 +545,6 @@
   </script>
 </body>
 </html>
+
 
 
