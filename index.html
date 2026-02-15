@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vocab Trainer (EN ↔ ES)</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .glass {
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
+          Vocab Trainer <span class="text-indigo-300">(EN ↔ ES)</span>
+        </h1>
+        <p class="text-slate-300 mt-1">
+          Guarda, busca y practica vocabulario en tu navegador.
+        </p>
+      </div>
+    </header>
+
+    <main class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
+        <h2 class="text-xl font-bold">Añadir palabra</h2>
+
+        <form id="addForm" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input id="enInput" type="text" placeholder="Inglés"
+            class="px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
+          <input id="esInput" type="text" placeholder="Español"
+            class="px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
+          <input id="pronInput" type="text" placeholder="Pronunciación"
+            class="px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
+          <button type="submit"
+            class="sm:col-span-3 px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold">
+            Guardar
+          </button>
+        </form>
+      </section>
+
+      <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
+        <h2 class="text-xl font-bold">Buscar</h2>
+
+        <input id="searchInput" type="text" placeholder="Buscar en inglés, español o pronunciación"
+          class="mt-3 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
+
+        <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-4 py-2 text-left">Inglés</th>
+                <th class="px-4 py-2 text-left">Español</th>
+                <th class="px-4 py-2 text-left">Pronunciación</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+const STORAGE_KEY = "vocab_trainer";
+
+let words = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+}
+
+function render(list = words) {
+  const body = document.getElementById("resultsBody");
+  body.innerHTML = "";
+  list.forEach(w => {
+    body.innerHTML += `
+      <tr>
+        <td class="px-4 py-2">${w.en}</td>
+        <td class="px-4 py-2">${w.es}</td>
+        <td class="px-4 py-2">${w.pron}</td>
+      </tr>`;
+  });
+}
+
+document.getElementById("addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const en = enInput.value.trim();
+  const es = esInput.value.trim();
+  const pron = pronInput.value.trim();
+  if (!en || !es) return;
+
+  const exists = words.find(w =>
+    w.en.toLowerCase() === en.toLowerCase() ||
+    w.es.toLowerCase() === es.toLowerCase() ||
+    w.pron.toLowerCase() === pron.toLowerCase()
+  );
+
+  if (!exists) {
+    words.push({ en, es, pron });
+    save();
+    render();
+  }
+
+  addForm.reset();
+});
+
+document.getElementById("searchInput").addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  const filtered = words.filter(w =>
+    w.en.toLowerCase().includes(q) ||
+    w.es.toLowerCase().includes(q) ||
+    w.pron.toLowerCase().includes(q)
+  );
+  render(filtered);
+});
+
+render();
+</script>
+</body>
+</html>
