@@ -30,14 +30,29 @@
           Diccionario <span class="text-indigo-300">Inglés ↔ Español</span>
         </h1>
         <p class="text-slate-300 mt-1">
-          Añade, busca, edita y elimina vocabulario. Porque equivocarse es humano, pero corregir también.
+          Añade, busca, edita y elimina vocabulario. Y ahora también puedes llevártelo en JSON, porque el caos no.
         </p>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span id="countBadge" class="text-sm px-3 py-1 rounded-full bg-slate-800 text-slate-100">
+      <div class="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
+        <span id="countBadge" class="text-sm px-3 py-2 rounded-xl bg-slate-800 text-slate-100">
           0 palabras
         </span>
+
+        <button id="exportBtn"
+          class="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-slate-950 font-semibold shadow">
+          Exportar JSON
+        </button>
+
+        <label class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-900 font-semibold shadow cursor-pointer">
+          Importar JSON
+          <input id="importFile" type="file" accept="application/json" class="hidden">
+        </label>
+
+        <button id="resetBtn"
+          class="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-400 active:bg-rose-600 text-slate-950 font-semibold shadow">
+          Reset
+        </button>
       </div>
     </header>
 
@@ -92,17 +107,19 @@
             </div>
           </div>
         </form>
+
+        <div class="mt-4 text-xs text-slate-600">
+          Guarda local (localStorage). Exporta JSON para backup o para pasarlo al móvil.
+        </div>
       </section>
 
       <!-- Right: Search + List -->
       <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-          <div>
-            <h2 class="text-xl font-bold">Buscar</h2>
-            <p id="resultsSub" class="text-sm text-slate-600 mt-1">
-              Busca en inglés, español o pronunciación.
-            </p>
-          </div>
+        <div>
+          <h2 class="text-xl font-bold">Buscar</h2>
+          <p id="resultsSub" class="text-sm text-slate-600 mt-1">
+            Busca en inglés, español o pronunciación.
+          </p>
         </div>
 
         <input id="searchInput" type="text" placeholder="Ej: apple | manzana | ˈæpəl"
@@ -131,7 +148,7 @@
     </main>
 
     <footer class="mt-8 text-xs text-slate-400">
-      Guardado local en este navegador (localStorage). Si cambias de PC o borras datos, se va. Como la paciencia.
+      Consejo: exporta tu JSON de vez en cuando. Los navegadores borran cosas “por optimización” y luego tú lloras.
     </footer>
   </div>
 
@@ -139,7 +156,7 @@
     // -----------------------------
     // Storage + Helpers
     // -----------------------------
-    const STORAGE_KEY = "diccionario_ingesp_words_v1";
+    const STORAGE_KEY = "diccionario_ingesp_words_v2";
 
     function cryptoId() {
       if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -220,9 +237,22 @@
     const resultsBody = document.getElementById("resultsBody");
     const emptyState = document.getElementById("emptyState");
 
+    const exportBtn = document.getElementById("exportBtn");
+    const importFile = document.getElementById("importFile");
+    const resetBtn = document.getElementById("resetBtn");
+
     // -----------------------------
     // CRUD
     // -----------------------------
+    function isExactDuplicate(en, es, pron, ignoreId=null) {
+      return words.some(w =>
+        w.id !== ignoreId &&
+        norm(w.en) === norm(en) &&
+        norm(w.es) === norm(es) &&
+        norm(w.pron) === norm(pron)
+      );
+    }
+
     function upsertWord({ en, es, pron }) {
       const item = {
         id: editingId ?? cryptoId(),
@@ -235,7 +265,6 @@
       if (editingId) {
         const idx = words.findIndex(w => w.id === editingId);
         if (idx !== -1) {
-          // Mantén createdAt original si existe
           item.createdAt = words[idx].createdAt ?? item.createdAt;
           words[idx] = item;
         } else {
@@ -288,13 +317,13 @@
 
     function getFiltered() {
       const q = norm(searchInput.value);
-      if (!q) return [...words].sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
+      const base = [...words].sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
 
-      const filtered = words.filter(w => {
-        return norm(w.en).includes(q) || norm(w.es).includes(q) || norm(w.pron).includes(q);
-      }).sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
+      if (!q) return base;
 
-      return filtered;
+      return base.filter(w =>
+        norm(w.en).includes(q) || norm(w.es).includes(q) || norm(w.pron).includes(q)
+      );
     }
 
     function render() {
@@ -306,7 +335,7 @@
 
       const q = norm(searchInput.value);
       if (!q) resultsSub.textContent = "Busca en inglés, español o pronunciación.";
-      else if (list.length === 0) resultsSub.textContent = "No hay coincidencias. Si la palabra existe en la vida real, añádela.";
+      else if (list.length === 0) resultsSub.textContent = "No hay coincidencias. Si existe, añádela.";
       else resultsSub.textContent = `Encontradas ${list.length} coincidencia${list.length === 1 ? "" : "s"}.`;
 
       for (const w of list) {
@@ -335,6 +364,81 @@
     }
 
     // -----------------------------
+    // Export / Import / Reset
+    // -----------------------------
+    exportBtn.addEventListener("click", () => {
+      const payload = {
+        app: "diccionario-ingesp",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        words
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "diccionario_ingesp_export.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    importFile.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+
+        const incoming = Array.isArray(parsed) ? parsed
+                        : Array.isArray(parsed.words) ? parsed.words
+                        : null;
+
+        if (!incoming) {
+          alert("JSON inválido: no encuentro una lista de palabras.");
+          return;
+        }
+
+        let added = 0;
+        for (const it of incoming) {
+          const en = (it.en ?? "").toString().trim();
+          const es = (it.es ?? "").toString().trim();
+          const pron = (it.pron ?? "").toString().trim();
+          if (!en || !es) continue;
+
+          if (!isExactDuplicate(en, es, pron, null)) {
+            words.push({ id: cryptoId(), en, es, pron, createdAt: Date.now() });
+            added++;
+          }
+        }
+
+        saveWords(words);
+        render();
+        alert(`Importación lista. Añadidas: ${added}.`);
+      } catch {
+        alert("No he podido importar ese archivo. (No era JSON válido o estaba corrupto.)");
+      } finally {
+        importFile.value = "";
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      const ok = confirm("Esto borrará todas tus palabras guardadas en este navegador. ¿Seguro?");
+      if (!ok) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      words = [];
+      cancelEdit();
+      searchInput.value = "";
+      saveWords(words);
+      render();
+    });
+
+    // -----------------------------
     // Events
     // -----------------------------
     searchInput.addEventListener("input", () => {
@@ -354,15 +458,7 @@
         return;
       }
 
-      // Evita duplicado exacto (pero deja editar el mismo registro)
-      const duplicate = words.find(w =>
-        w.id !== editingId &&
-        norm(w.en) === norm(en) &&
-        norm(w.es) === norm(es) &&
-        norm(w.pron) === norm(pron)
-      );
-
-      if (duplicate) {
+      if (isExactDuplicate(en, es, pron, editingId)) {
         showStatus("Esa palabra ya existe exactamente igual. No la duplico.", "warn");
         return;
       }
@@ -370,7 +466,7 @@
       upsertWord({ en, es, pron });
       showStatus(editingId ? "Cambios guardados." : "Palabra guardada.", "ok");
 
-      cancelEdit(); // resetea el form + modo
+      cancelEdit();
       render();
     });
 
@@ -398,7 +494,6 @@
         const ok = confirm(`¿Eliminar "${w.en}" (${w.es})?`);
         if (!ok) return;
 
-        // si estás editando esa misma, cancela
         if (editingId === id) cancelEdit();
 
         deleteWord(id);
