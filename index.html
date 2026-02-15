@@ -223,4 +223,191 @@
     // -----------------------------
     // CRUD
     // -----------------------------
-    function upsertWord({ en, es, pr
+    function upsertWord({ en, es, pron }) {
+      const item = {
+        id: editingId ?? cryptoId(),
+        en,
+        es,
+        pron,
+        createdAt: Date.now()
+      };
+
+      if (editingId) {
+        const idx = words.findIndex(w => w.id === editingId);
+        if (idx !== -1) {
+          // Mantén createdAt original si existe
+          item.createdAt = words[idx].createdAt ?? item.createdAt;
+          words[idx] = item;
+        } else {
+          words.push(item);
+        }
+      } else {
+        words.push(item);
+      }
+
+      saveWords(words);
+    }
+
+    function deleteWord(id) {
+      words = words.filter(w => w.id !== id);
+      saveWords(words);
+    }
+
+    function startEdit(id) {
+      const w = words.find(x => x.id === id);
+      if (!w) return;
+
+      editingId = id;
+      enInput.value = w.en;
+      esInput.value = w.es;
+      pronInput.value = w.pron;
+
+      formTitle.textContent = "Editar palabra";
+      editBadge.classList.remove("hidden");
+      cancelEditBtn.classList.remove("hidden");
+      showStatus("Editando. Cambia lo que quieras y pulsa Guardar.", "info");
+      enInput.focus();
+    }
+
+    function cancelEdit() {
+      editingId = null;
+      formTitle.textContent = "Añadir palabra";
+      editBadge.classList.add("hidden");
+      cancelEditBtn.classList.add("hidden");
+      wordForm.reset();
+      hideStatus();
+      enInput.focus();
+    }
+
+    // -----------------------------
+    // Search + Render
+    // -----------------------------
+    function updateCount() {
+      countBadge.textContent = `${words.length} palabra${words.length === 1 ? "" : "s"}`;
+    }
+
+    function getFiltered() {
+      const q = norm(searchInput.value);
+      if (!q) return [...words].sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
+
+      const filtered = words.filter(w => {
+        return norm(w.en).includes(q) || norm(w.es).includes(q) || norm(w.pron).includes(q);
+      }).sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
+
+      return filtered;
+    }
+
+    function render() {
+      updateCount();
+
+      const list = getFiltered();
+      resultsBody.innerHTML = "";
+      emptyState.classList.toggle("hidden", list.length !== 0);
+
+      const q = norm(searchInput.value);
+      if (!q) resultsSub.textContent = "Busca en inglés, español o pronunciación.";
+      else if (list.length === 0) resultsSub.textContent = "No hay coincidencias. Si la palabra existe en la vida real, añádela.";
+      else resultsSub.textContent = `Encontradas ${list.length} coincidencia${list.length === 1 ? "" : "s"}.`;
+
+      for (const w of list) {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50";
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-semibold text-slate-900">${escapeHtml(w.en)}</td>
+          <td class="px-4 py-3 text-slate-800">${escapeHtml(w.es)}</td>
+          <td class="px-4 py-3 text-slate-700 mono">${escapeHtml(w.pron)}</td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-2">
+              <button data-act="edit" data-id="${w.id}"
+                class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 active:bg-amber-300 text-amber-950 font-semibold">
+                Editar
+              </button>
+              <button data-act="del" data-id="${w.id}"
+                class="px-3 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 active:bg-rose-300 text-rose-950 font-semibold">
+                Eliminar
+              </button>
+            </div>
+          </td>
+        `;
+        resultsBody.appendChild(tr);
+      }
+    }
+
+    // -----------------------------
+    // Events
+    // -----------------------------
+    searchInput.addEventListener("input", () => {
+      render();
+      hideStatus();
+    });
+
+    wordForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const en = enInput.value.trim();
+      const es = esInput.value.trim();
+      const pron = pronInput.value.trim();
+
+      if (!en || !es) {
+        showStatus("Inglés y Español son obligatorios. (Pronunciación opcional.)", "warn");
+        return;
+      }
+
+      // Evita duplicado exacto (pero deja editar el mismo registro)
+      const duplicate = words.find(w =>
+        w.id !== editingId &&
+        norm(w.en) === norm(en) &&
+        norm(w.es) === norm(es) &&
+        norm(w.pron) === norm(pron)
+      );
+
+      if (duplicate) {
+        showStatus("Esa palabra ya existe exactamente igual. No la duplico.", "warn");
+        return;
+      }
+
+      upsertWord({ en, es, pron });
+      showStatus(editingId ? "Cambios guardados." : "Palabra guardada.", "ok");
+
+      cancelEdit(); // resetea el form + modo
+      render();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      wordForm.reset();
+      hideStatus();
+      enInput.focus();
+    });
+
+    cancelEditBtn.addEventListener("click", cancelEdit);
+
+    resultsBody.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-act]");
+      if (!btn) return;
+
+      const act = btn.dataset.act;
+      const id = btn.dataset.id;
+
+      if (act === "edit") {
+        startEdit(id);
+      } else if (act === "del") {
+        const w = words.find(x => x.id === id);
+        if (!w) return;
+
+        const ok = confirm(`¿Eliminar "${w.en}" (${w.es})?`);
+        if (!ok) return;
+
+        // si estás editando esa misma, cancela
+        if (editingId === id) cancelEdit();
+
+        deleteWord(id);
+        render();
+      }
+    });
+
+    // Init
+    render();
+  </script>
+</body>
+</html>
