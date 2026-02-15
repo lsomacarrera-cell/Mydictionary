@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vocab Trainer (EN ↔ ES)</title>
+  <title>Diccionario Inglés ↔ Español</title>
 
-  <!-- Tailwind CSS via CDN -->
+  <!-- Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -23,112 +23,204 @@
 
 <body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
   <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
     <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
-          Vocab Trainer <span class="text-indigo-300">(EN ↔ ES)</span>
+          Diccionario <span class="text-indigo-300">Inglés ↔ Español</span>
         </h1>
         <p class="text-slate-300 mt-1">
-          Guarda, busca y practica vocabulario en tu navegador.
+          Añade, busca, edita y elimina vocabulario. Porque equivocarse es humano, pero corregir también.
         </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="countBadge" class="text-sm px-3 py-1 rounded-full bg-slate-800 text-slate-100">
+          0 palabras
+        </span>
       </div>
     </header>
 
+    <!-- Main -->
     <main class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Left: Form -->
       <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
-        <h2 class="text-xl font-bold">Añadir palabra</h2>
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-xl font-bold" id="formTitle">Añadir palabra</h2>
+          <span id="editBadge" class="text-xs px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hidden">
+            Editando
+          </span>
+        </div>
 
-        <form id="addForm" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <input id="enInput" type="text" placeholder="Inglés"
-            class="px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
-          <input id="esInput" type="text" placeholder="Español"
-            class="px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
-          <input id="pronInput" type="text" placeholder="Pronunciación"
-            class="px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
-          <button type="submit"
-            class="sm:col-span-3 px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold">
-            Guardar
-          </button>
+        <form id="wordForm" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700">Inglés</label>
+            <input id="enInput" type="text" placeholder="apple"
+              class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700">Español</label>
+            <input id="esInput" type="text" placeholder="manzana"
+              class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700">Pronunciación</label>
+            <input id="pronInput" type="text" placeholder="ˈæpəl"
+              class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+          </div>
+
+          <div class="sm:col-span-3 flex flex-col sm:flex-row gap-3 mt-2">
+            <button type="submit"
+              class="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-black text-white font-semibold shadow">
+              Guardar
+            </button>
+
+            <button id="cancelEditBtn" type="button"
+              class="w-full sm:w-auto px-5 py-3 rounded-xl bg-amber-100 hover:bg-amber-200 active:bg-amber-300 text-amber-950 font-semibold shadow hidden">
+              Cancelar edición
+            </button>
+
+            <button id="clearBtn" type="button"
+              class="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-900 font-semibold shadow">
+              Limpiar
+            </button>
+
+            <div id="status"
+              class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm hidden">
+            </div>
+          </div>
         </form>
       </section>
 
+      <!-- Right: Search + List -->
       <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
-        <h2 class="text-xl font-bold">Buscar</h2>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold">Buscar</h2>
+            <p id="resultsSub" class="text-sm text-slate-600 mt-1">
+              Busca en inglés, español o pronunciación.
+            </p>
+          </div>
+        </div>
 
-        <input id="searchInput" type="text" placeholder="Buscar en inglés, español o pronunciación"
-          class="mt-3 w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"/>
+        <input id="searchInput" type="text" placeholder="Ej: apple | manzana | ˈæpəl"
+          class="mt-3 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
 
         <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <table class="min-w-full text-sm">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-4 py-2 text-left">Inglés</th>
-                <th class="px-4 py-2 text-left">Español</th>
-                <th class="px-4 py-2 text-left">Pronunciación</th>
-              </tr>
-            </thead>
-            <tbody id="resultsBody"></tbody>
-          </table>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-slate-50 border-b border-slate-200">
+                <tr class="text-left text-slate-600">
+                  <th class="px-4 py-3 font-semibold">Inglés</th>
+                  <th class="px-4 py-3 font-semibold">Español</th>
+                  <th class="px-4 py-3 font-semibold">Pronunciación</th>
+                  <th class="px-4 py-3 font-semibold">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="emptyState" class="mt-4 text-sm text-slate-600 hidden">
+          No hay resultados. Añade alguna palabra.
         </div>
       </section>
     </main>
+
+    <footer class="mt-8 text-xs text-slate-400">
+      Guardado local en este navegador (localStorage). Si cambias de PC o borras datos, se va. Como la paciencia.
+    </footer>
   </div>
 
-<script>
-const STORAGE_KEY = "vocab_trainer";
+  <script>
+    // -----------------------------
+    // Storage + Helpers
+    // -----------------------------
+    const STORAGE_KEY = "diccionario_ingesp_words_v1";
 
-let words = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    function cryptoId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return "id_" + Math.random().toString(16).slice(2) + "_" + Date.now();
+    }
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
-}
+    function norm(s) {
+      return (s ?? "")
+        .toString()
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
 
-function render(list = words) {
-  const body = document.getElementById("resultsBody");
-  body.innerHTML = "";
-  list.forEach(w => {
-    body.innerHTML += `
-      <tr>
-        <td class="px-4 py-2">${w.en}</td>
-        <td class="px-4 py-2">${w.es}</td>
-        <td class="px-4 py-2">${w.pron}</td>
-      </tr>`;
-  });
-}
+    function escapeHtml(str) {
+      return (str ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
 
-document.getElementById("addForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const en = enInput.value.trim();
-  const es = esInput.value.trim();
-  const pron = pronInput.value.trim();
-  if (!en || !es) return;
+    function loadWords() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
 
-  const exists = words.find(w =>
-    w.en.toLowerCase() === en.toLowerCase() ||
-    w.es.toLowerCase() === es.toLowerCase() ||
-    w.pron.toLowerCase() === pron.toLowerCase()
-  );
+    function saveWords(words) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+    }
 
-  if (!exists) {
-    words.push({ en, es, pron });
-    save();
-    render();
-  }
+    function showStatus(msg, type="info") {
+      const el = document.getElementById("status");
+      el.classList.remove("hidden");
+      el.textContent = msg;
 
-  addForm.reset();
-});
+      el.className = "flex-1 px-4 py-3 rounded-xl border text-sm";
+      if (type === "ok") el.classList.add("bg-emerald-50","border-emerald-200","text-emerald-800");
+      else if (type === "warn") el.classList.add("bg-amber-50","border-amber-200","text-amber-800");
+      else if (type === "err") el.classList.add("bg-rose-50","border-rose-200","text-rose-800");
+      else el.classList.add("bg-slate-50","border-slate-200","text-slate-700");
+    }
 
-document.getElementById("searchInput").addEventListener("input", e => {
-  const q = e.target.value.toLowerCase();
-  const filtered = words.filter(w =>
-    w.en.toLowerCase().includes(q) ||
-    w.es.toLowerCase().includes(q) ||
-    w.pron.toLowerCase().includes(q)
-  );
-  render(filtered);
-});
+    function hideStatus() {
+      document.getElementById("status").classList.add("hidden");
+    }
 
-render();
-</script>
-</body>
-</html>
+    // -----------------------------
+    // State
+    // -----------------------------
+    let words = loadWords();
+    let editingId = null;
+
+    // -----------------------------
+    // Elements
+    // -----------------------------
+    const countBadge = document.getElementById("countBadge");
+    const formTitle = document.getElementById("formTitle");
+    const editBadge = document.getElementById("editBadge");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+    const wordForm = document.getElementById("wordForm");
+    const enInput = document.getElementById("enInput");
+    const esInput = document.getElementById("esInput");
+    const pronInput = document.getElementById("pronInput");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const searchInput = document.getElementById("searchInput");
+    const resultsSub = document.getElementById("resultsSub");
+    const resultsBody = document.getElementById("resultsBody");
+    const emptyState = document.getElementById("emptyState");
+
+    // -----------------------------
+    // CRUD
+    // -----------------------------
+    function upsertWord({ en, es, pr
