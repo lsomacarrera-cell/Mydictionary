@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Diccionario Inglés ↔ Español</title>
+  <title>VocabPop · Inglés ↔ Español</title>
 
   <!-- Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,121 +11,162 @@
   <style>
     .glass {
       background: rgba(255,255,255,0.72);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255,255,255,0.35);
+    }
+    .card {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(255,255,255,0.45);
+      box-shadow: 0 20px 60px rgba(2, 6, 23, 0.20);
     }
     .mono {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
     }
+    .soft-ring:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
+    }
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100">
+<body class="min-h-screen text-slate-900">
+  <!-- Background (alegre y moderno) -->
+  <div class="fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-br from-fuchsia-200 via-sky-200 to-emerald-200"></div>
+    <div class="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-fuchsia-300/50 blur-3xl"></div>
+    <div class="absolute top-32 -right-28 h-[28rem] w-[28rem] rounded-full bg-sky-300/50 blur-3xl"></div>
+    <div class="absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-emerald-300/50 blur-3xl"></div>
+    <div class="absolute inset-0 bg-white/20"></div>
+  </div>
+
   <div class="max-w-6xl mx-auto px-4 py-8">
     <!-- Header -->
-    <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
-          Diccionario <span class="text-indigo-300">Inglés ↔ Español</span>
-        </h1>
-        <p class="text-slate-300 mt-1">
-          Añade, busca, edita y elimina vocabulario. Y ahora también puedes llevártelo en JSON, porque el caos no.
-        </p>
+    <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-fuchsia-500 via-indigo-500 to-emerald-500 shadow-lg grid place-items-center">
+          <span class="text-white text-xl">📚</span>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            VocabPop <span class="text-slate-600 font-bold">· Inglés ↔ Español</span>
+          </h1>
+          <p class="text-slate-700">
+            Guarda, busca, edita y exporta tu vocabulario. Modernito, rápido y sin dramas.
+          </p>
+        </div>
       </div>
 
-      <div class="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
-        <span id="countBadge" class="text-sm px-3 py-2 rounded-xl bg-slate-800 text-slate-100">
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="countBadge" class="px-3 py-2 rounded-2xl bg-white/80 border border-white/60 shadow-sm text-sm font-semibold">
           0 palabras
         </span>
 
         <button id="exportBtn"
-          class="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-slate-950 font-semibold shadow">
-          Exportar JSON
+          class="px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm active:scale-[0.99] transition">
+          ⬇️ Exportar
         </button>
 
-        <label class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-900 font-semibold shadow cursor-pointer">
-          Importar JSON
+        <label class="px-4 py-2 rounded-2xl bg-white/80 hover:bg-white text-slate-900 font-semibold shadow-sm cursor-pointer border border-white/60 active:scale-[0.99] transition">
+          ⬆️ Importar
           <input id="importFile" type="file" accept="application/json" class="hidden">
         </label>
 
         <button id="resetBtn"
-          class="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-400 active:bg-rose-600 text-slate-950 font-semibold shadow">
-          Reset
+          class="px-4 py-2 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-semibold shadow-sm active:scale-[0.99] transition">
+          🧨 Reset
         </button>
       </div>
     </header>
 
     <!-- Main -->
     <main class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Left: Form -->
-      <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
-        <div class="flex items-center justify-between gap-3">
-          <h2 class="text-xl font-bold" id="formTitle">Añadir palabra</h2>
-          <span id="editBadge" class="text-xs px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hidden">
-            Editando
+      <!-- Left -->
+      <section class="card rounded-3xl p-5 sm:p-6">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-extrabold" id="formTitle">Añadir palabra</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Inglés, español y (si quieres) pronunciación. Si te equivocas, lo editas. Qué fantasía.
+            </p>
+          </div>
+          <span id="editBadge" class="text-xs px-3 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hidden">
+            ✏️ Editando
           </span>
         </div>
 
-        <form id="wordForm" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
+        <form id="wordForm" class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-1">
             <label class="block text-sm font-semibold text-slate-700">Inglés</label>
             <input id="enInput" type="text" placeholder="apple"
-              class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+              class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
           </div>
 
-          <div>
+          <div class="sm:col-span-1">
             <label class="block text-sm font-semibold text-slate-700">Español</label>
             <input id="esInput" type="text" placeholder="manzana"
-              class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+              class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
           </div>
 
-          <div>
+          <div class="sm:col-span-1">
             <label class="block text-sm font-semibold text-slate-700">Pronunciación</label>
             <input id="pronInput" type="text" placeholder="ˈæpəl"
-              class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+              class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring mono"/>
           </div>
 
           <div class="sm:col-span-3 flex flex-col sm:flex-row gap-3 mt-2">
             <button type="submit"
-              class="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-black text-white font-semibold shadow">
-              Guardar
+              class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold shadow-sm active:scale-[0.99] transition">
+              💾 Guardar
             </button>
 
             <button id="cancelEditBtn" type="button"
-              class="w-full sm:w-auto px-5 py-3 rounded-xl bg-amber-100 hover:bg-amber-200 active:bg-amber-300 text-amber-950 font-semibold shadow hidden">
-              Cancelar edición
+              class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-semibold shadow-sm active:scale-[0.99] transition hidden">
+              ✋ Cancelar
             </button>
 
             <button id="clearBtn" type="button"
-              class="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-900 font-semibold shadow">
-              Limpiar
+              class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/80 hover:bg-white text-slate-900 font-semibold shadow-sm border border-white/60 active:scale-[0.99] transition">
+              🧽 Limpiar
             </button>
 
             <div id="status"
-              class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm hidden">
+              class="flex-1 px-4 py-3 rounded-2xl bg-white/80 border border-white/60 text-slate-800 text-sm hidden shadow-sm">
             </div>
           </div>
         </form>
 
         <div class="mt-4 text-xs text-slate-600">
-          Guarda local (localStorage). Exporta JSON para backup o para pasarlo al móvil.
+          Tip: exporta el JSON de vez en cuando. Los navegadores tienen la empatía de una piedra.
         </div>
       </section>
 
-      <!-- Right: Search + List -->
-      <section class="glass rounded-2xl p-5 text-slate-900 shadow-xl">
-        <div>
-          <h2 class="text-xl font-bold">Buscar</h2>
-          <p id="resultsSub" class="text-sm text-slate-600 mt-1">
-            Busca en inglés, español o pronunciación.
-          </p>
+      <!-- Right -->
+      <section class="card rounded-3xl p-5 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-extrabold">Buscar</h2>
+            <p id="resultsSub" class="text-sm text-slate-600 mt-1">
+              Busca en inglés, español o pronunciación.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-3 py-1.5 rounded-full bg-white/80 border border-white/60 shadow-sm">
+              🔎 búsqueda inteligente
+            </span>
+          </div>
         </div>
 
-        <input id="searchInput" type="text" placeholder="Ej: apple | manzana | ˈæpəl"
-          class="mt-3 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"/>
+        <div class="mt-4">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">🔎</div>
+            <input id="searchInput" type="text" placeholder="Ej: apple | manzana | ˈæpəl"
+              class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
+          </div>
+        </div>
 
-        <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div class="mt-4 overflow-hidden rounded-3xl border border-slate-200 bg-white">
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
               <thead class="bg-slate-50 border-b border-slate-200">
@@ -142,13 +183,13 @@
         </div>
 
         <div id="emptyState" class="mt-4 text-sm text-slate-600 hidden">
-          No hay resultados. Añade alguna palabra.
+          No hay resultados. Añade alguna palabra y empezamos a fingir disciplina.
         </div>
       </section>
     </main>
 
-    <footer class="mt-8 text-xs text-slate-400">
-      Consejo: exporta tu JSON de vez en cuando. Los navegadores borran cosas “por optimización” y luego tú lloras.
+    <footer class="mt-8 text-xs text-slate-700">
+      Hecho con Tailwind (CDN) y guardado local en tu navegador (localStorage).
     </footer>
   </div>
 
@@ -156,7 +197,7 @@
     // -----------------------------
     // Storage + Helpers
     // -----------------------------
-    const STORAGE_KEY = "diccionario_ingesp_words_v2";
+    const STORAGE_KEY = "vocabpop_words_v1";
 
     function cryptoId() {
       if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -201,11 +242,11 @@
       el.classList.remove("hidden");
       el.textContent = msg;
 
-      el.className = "flex-1 px-4 py-3 rounded-xl border text-sm";
-      if (type === "ok") el.classList.add("bg-emerald-50","border-emerald-200","text-emerald-800");
-      else if (type === "warn") el.classList.add("bg-amber-50","border-amber-200","text-amber-800");
-      else if (type === "err") el.classList.add("bg-rose-50","border-rose-200","text-rose-800");
-      else el.classList.add("bg-slate-50","border-slate-200","text-slate-700");
+      el.className = "flex-1 px-4 py-3 rounded-2xl border text-sm shadow-sm";
+      if (type === "ok") el.classList.add("bg-emerald-50","border-emerald-200","text-emerald-900");
+      else if (type === "warn") el.classList.add("bg-amber-50","border-amber-200","text-amber-900");
+      else if (type === "err") el.classList.add("bg-rose-50","border-rose-200","text-rose-900");
+      else el.classList.add("bg-white/80","border-white/60","text-slate-800");
     }
 
     function hideStatus() {
@@ -318,9 +359,7 @@
     function getFiltered() {
       const q = norm(searchInput.value);
       const base = [...words].sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
-
       if (!q) return base;
-
       return base.filter(w =>
         norm(w.en).includes(q) || norm(w.es).includes(q) || norm(w.pron).includes(q)
       );
@@ -349,12 +388,12 @@
           <td class="px-4 py-3">
             <div class="flex flex-wrap gap-2">
               <button data-act="edit" data-id="${w.id}"
-                class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 active:bg-amber-300 text-amber-950 font-semibold">
-                Editar
+                class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-semibold active:scale-[0.99] transition">
+                ✏️ Editar
               </button>
               <button data-act="del" data-id="${w.id}"
-                class="px-3 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 active:bg-rose-300 text-rose-950 font-semibold">
-                Eliminar
+                class="px-3 py-1.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-950 font-semibold active:scale-[0.99] transition">
+                🗑️ Eliminar
               </button>
             </div>
           </td>
@@ -368,7 +407,7 @@
     // -----------------------------
     exportBtn.addEventListener("click", () => {
       const payload = {
-        app: "diccionario-ingesp",
+        app: "vocabpop",
         version: 1,
         exportedAt: new Date().toISOString(),
         words
@@ -379,7 +418,7 @@
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "diccionario_ingesp_export.json";
+      a.download = "vocabpop_export.json";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -420,7 +459,7 @@
         render();
         alert(`Importación lista. Añadidas: ${added}.`);
       } catch {
-        alert("No he podido importar ese archivo. (No era JSON válido o estaba corrupto.)");
+        alert("No he podido importar ese archivo. No era JSON válido o estaba corrupto.");
       } finally {
         importFile.value = "";
       }
