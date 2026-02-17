@@ -309,30 +309,35 @@
 }
 
 
-   function render(){
+function render(){
   updateCount();
 
   const list = getFiltered();
   resultsBody.innerHTML = "";
-  emptyState.classList.toggle("hidden", list.length !== 0);
 
   const q = norm(searchInput.value);
-  const showActions = q.length > 0; // SOLO mostrar acciones si hay búsqueda
+  const showActions = q.length > 0;
 
-  if(!q) {
-    resultsSub.textContent = "Modo repaso: solo lectura.";
-  } else if(list.length === 0) {
+  // Texto bajo "Buscar"
+  if(!q){
+    resultsSub.textContent = "Tu vocabulario completo. Escribe para filtrar.";
+  } else if(list.length === 0){
     resultsSub.textContent = "No hay coincidencias.";
   } else {
     resultsSub.textContent = `Encontradas ${list.length} coincidencia${list.length===1?"":"s"}.`;
   }
 
-  // Mostrar u ocultar cabecera Acciones
-  const thAcciones = document.querySelector("th:last-child");
+  // Mostrar/ocultar columna Acciones
+  const ths = document.querySelectorAll("thead th");
+  const thAcciones = ths[ths.length - 1];
   if(thAcciones){
     thAcciones.style.display = showActions ? "" : "none";
   }
 
+  // Estado vacío
+  emptyState.classList.toggle("hidden", list.length !== 0);
+
+  // Pintar filas
   for(const w of list){
     const tr = document.createElement("tr");
     tr.className = "hover:bg-slate-50";
@@ -355,7 +360,7 @@
       </td>
     `;
 
-    // Ocultar columna acciones si no hay búsqueda
+    // Ocultar Acciones en modo repaso
     if(!showActions){
       tr.querySelector(".acciones-col").style.display = "none";
     }
@@ -592,6 +597,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
