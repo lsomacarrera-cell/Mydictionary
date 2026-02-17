@@ -300,14 +300,14 @@
       countBadge.textContent = `${words.length} palabra${words.length === 1 ? "" : "s"}`;
     }
 
-    function getFiltered() {
-      const q = norm(searchInput.value);
-      const base = [...words].sort((a,b) => norm(a.en).localeCompare(norm(b.en), "es"));
-      if (!q) return base;
-      return base.filter(w =>
-        norm(w.en).includes(q) || norm(w.es).includes(q) || norm(w.pron).includes(q)
-      );
-    }
+   function getFiltered(){
+  const q = norm(searchInput.value);
+  if(!q) return [...words];   // <- esto hace que muestre todo por defecto
+  return words.filter(w =>
+    norm(w.en).includes(q) || norm(w.es).includes(q) || norm(w.pron).includes(q)
+  );
+}
+
 
    function render(){
   updateCount();
@@ -592,6 +592,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
