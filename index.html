@@ -76,70 +76,20 @@
           class="px-4 py-2 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-semibold shadow-sm active:scale-[0.99] transition">
           🧨 Reset
         </button>
+
+        <button id="openAddBtn"
+  class="px-4 py-2 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold shadow-sm active:scale-[0.99] transition">
+  ➕ Añadir
+</button>
+
+        
       </div>
     </header>
 
     <!-- Main -->
     <main class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Left -->
-      <section class="card rounded-3xl p-5 sm:p-6">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <h2 class="text-xl font-extrabold" id="formTitle">Añadir palabra</h2>
-            <p class="text-sm text-slate-600 mt-1">
-              Inglés, español y (si quieres) pronunciación. Si te equivocas, lo editas. Qué fantasía.
-            </p>
-          </div>
-          <span id="editBadge" class="text-xs px-3 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200 hidden">
-            ✏️ Editando
-          </span>
-        </div>
 
-        <form id="wordForm" class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="sm:col-span-1">
-            <label class="block text-sm font-semibold text-slate-700">Inglés</label>
-            <input id="enInput" type="text" placeholder="apple"
-              class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
-          </div>
-
-          <div class="sm:col-span-1">
-            <label class="block text-sm font-semibold text-slate-700">Español</label>
-            <input id="esInput" type="text" placeholder="manzana"
-              class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
-          </div>
-
-          <div class="sm:col-span-1">
-            <label class="block text-sm font-semibold text-slate-700">Pronunciación</label>
-            <input id="pronInput" type="text" placeholder="ˈæpəl"
-              class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring mono"/>
-          </div>
-
-          <div class="sm:col-span-3 flex flex-col sm:flex-row gap-3 mt-2">
-            <button type="submit"
-              class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold shadow-sm active:scale-[0.99] transition">
-              💾 Guardar
-            </button>
-
-            <button id="cancelEditBtn" type="button"
-              class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-semibold shadow-sm active:scale-[0.99] transition hidden">
-              ✋ Cancelar
-            </button>
-
-            <button id="clearBtn" type="button"
-              class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/80 hover:bg-white text-slate-900 font-semibold shadow-sm border border-white/60 active:scale-[0.99] transition">
-              🧽 Limpiar
-            </button>
-
-            <div id="status"
-              class="flex-1 px-4 py-3 rounded-2xl bg-white/80 border border-white/60 text-slate-800 text-sm hidden shadow-sm">
-            </div>
-          </div>
-        </form>
-
-        <div class="mt-4 text-xs text-slate-600">
-          Tip: exporta el JSON de vez en cuando. Los navegadores tienen la empatía de una piedra.
-        </div>
-      </section>
 
       <!-- Right -->
       <section class="card rounded-3xl p-5 sm:p-6">
@@ -552,12 +502,97 @@
         render();
       }
     });
+const openAddBtn = document.getElementById("openAddBtn");
+const addModal = document.getElementById("addModal");
+const closeAddModalBtn = document.getElementById("closeAddModalBtn");
+
+function openAddModal(){
+  addModal.classList.remove("hidden");
+  addModal.classList.add("flex");
+  setTimeout(() => enInput.focus(), 50);
+}
+
+function closeAddModal(){
+  addModal.classList.add("hidden");
+  addModal.classList.remove("flex");
+  hideStatus();
+}
+
+openAddBtn.addEventListener("click", openAddModal);
+closeAddModalBtn.addEventListener("click", closeAddModal);
+
+// cerrar al clicar fuera del cuadro
+addModal.addEventListener("click", (e) => {
+  if(e.target === addModal){
+    closeAddModal();
+  }
+});
 
     // Init
     render();
   </script>
+  <!-- Modal Añadir/Editar -->
+<div id="addModal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center p-4">
+  <div class="card rounded-3xl w-full max-w-2xl p-5 sm:p-6">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-extrabold" id="formTitle">Añadir palabra</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          Añade nuevas palabras cuando lo necesites.
+        </p>
+      </div>
+      <button id="closeAddModalBtn"
+        class="px-3 py-2 rounded-2xl bg-white/80 border border-white/60 hover:bg-white font-semibold">
+        ✖
+      </button>
+    </div>
+
+    <form id="wordForm" class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700">Inglés</label>
+        <input id="enInput" type="text"
+          class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700">Español</label>
+        <input id="esInput" type="text"
+          class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring"/>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700">Pronunciación</label>
+        <input id="pronInput" type="text"
+          class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring mono"/>
+      </div>
+
+      <div class="sm:col-span-3 flex flex-col sm:flex-row gap-3 mt-2">
+        <button type="submit"
+          class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold">
+          💾 Guardar
+        </button>
+
+        <button id="cancelEditBtn" type="button"
+          class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-100 text-amber-950 font-semibold hidden">
+          ✋ Cancelar
+        </button>
+
+        <button id="clearBtn" type="button"
+          class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/80 border border-white/60 font-semibold">
+          🧽 Limpiar
+        </button>
+
+        <div id="status"
+          class="flex-1 px-4 py-3 rounded-2xl bg-white/80 border border-white/60 text-slate-800 text-sm hidden">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 </body>
 </html>
+
 
 
 
