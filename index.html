@@ -296,9 +296,10 @@
     // -----------------------------
     // Search + Render
     // -----------------------------
-    function updateCount() {
-      countBadge.textContent = `${words.length} palabra${words.length === 1 ? "" : "s"}`;
-    }
+  function updateCount() {
+  countBadge.textContent = `${words.length} palabra${words.length === 1 ? "" : "s"}`;
+}
+
 
    function getFiltered(){
   const q = norm(searchInput.value);
@@ -597,6 +598,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
