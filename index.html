@@ -317,7 +317,7 @@ function render(){
   resultsBody.innerHTML = "";
 
   const q = norm(searchInput.value);
-  const showActions = q.length > 0;
+  const showActions = list.length > 0;
 
   // Texto bajo "Buscar"
   if(!q){
@@ -598,6 +598,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
