@@ -200,7 +200,13 @@
     // -----------------------------
     // State
     // -----------------------------
-    let words = loadWords();
+    let words = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  words = loadWords();
+  render();
+});
+
     let editingId = null;
 
     // -----------------------------
@@ -598,6 +604,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
