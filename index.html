@@ -377,8 +377,6 @@ catChecks.forEach(c => {
   c.checked = w.cats?.includes(c.value);
 });
   formTitle.textContent = "Editar palabra";
-  editBadge.classList.remove("hidden");
-  cancelEditBtn.classList.remove("hidden");
   showStatus("Editando. Cambia lo que quieras y pulsa Guardar.", "info");
 
   openAddModal(); // ⭐ ABRIR EL MODAL AQUÍ
@@ -660,6 +658,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
