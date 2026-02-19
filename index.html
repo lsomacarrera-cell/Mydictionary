@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    function upsertWord({ en, es, pron }) {
+    function upsertWord({ en, es, pron, cats }) {
       const item = {
         id: editingId ?? cryptoId(),
         en,
@@ -660,6 +660,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
