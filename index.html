@@ -590,7 +590,7 @@ toggleActionsBtn.addEventListener("click", () => {
         return;
       }
 
-      upsertWord({ en, es, pron });
+     upsertWord({ en, es, pron, cats });
       showStatus(editingId ? "Cambios guardados." : "Palabra guardada.", "ok");
 
       cancelEdit();
@@ -660,6 +660,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
