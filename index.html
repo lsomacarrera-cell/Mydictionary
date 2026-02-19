@@ -244,6 +244,15 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
     }
 
+function cancelEdit() {
+  editingId = null;
+  formTitle.textContent = "Añadir palabra";
+  cancelEditBtn.classList.add("hidden");
+  wordForm.reset();
+  hideStatus();
+  enInput.focus();
+}
+    
     function showStatus(msg, type="info") {
       const el = document.getElementById("status");
       el.classList.remove("hidden");
@@ -613,6 +622,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
