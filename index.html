@@ -27,6 +27,14 @@
       outline: none;
       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
     }
+    .fade-swap {
+  animation: fadeSwap 180ms ease-out;
+}
+
+@keyframes fadeSwap {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
   </style>
 </head>
 
@@ -199,7 +207,12 @@
   <button type="submit"
     class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold">
     💾 Guardar
+    
   </button>
+<button id="nextEditBtn" type="button"
+        class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold hidden">
+    ➡️ Siguiente
+</button>
 
   <button id="cancelEditBtn" type="button"
     class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-100 text-amber-950 font-semibold hidden">
@@ -265,12 +278,44 @@ function cancelEdit() {
   editingId = null;
   formTitle.textContent = "Añadir palabra";
   cancelEditBtn.classList.add("hidden");
+  nextEditBtn.classList.add("hidden");
+  currentEditIndex = null;
   wordForm.reset();
   catChecks.forEach(c => c.checked = false);
   hideStatus();
   enInput.focus();
 }
-    
+    function nextEdit() {
+  // 1. Guardar cambios actuales
+  const en = enInput.value.trim();
+  const es = esInput.value.trim();
+  const pron = pronInput.value.trim();
+  const cats = [...catChecks]
+    .filter(c => c.checked)
+    .map(c => c.value);
+
+  if (!en || !es) {
+    showStatus("Inglés y Español son obligatorios.", "warn");
+    return;
+  }
+
+  upsertWord({ en, es, pron, cats });
+
+  // 2. Avanzar al siguiente índice
+  const nextIndex = currentEditIndex + 1;
+
+if (nextIndex >= words.length) {
+  // ⭐ Última palabra → cerrar edición
+  showStatus("Edición finalizada.", "ok");
+  cancelEdit();   // ⭐ Cerramos modo edición
+  return;
+}
+
+  // 3. Cargar la siguiente palabra
+  const nextWord = words[nextIndex];
+  currentEditIndex = nextIndex;
+  startEdit(nextWord.id);
+}
     function showStatus(msg, type="info") {
       const el = document.getElementById("status");
       el.classList.remove("hidden");
@@ -298,6 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
     let editingId = null;
+    let currentEditIndex = null;
 
     // -----------------------------
     // Elements
@@ -306,7 +352,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const formTitle = document.getElementById("formTitle");
     const editBadge = document.getElementById("editBadge");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const nextEditBtn = document.getElementById("nextEditBtn");
     cancelEditBtn.addEventListener("click", cancelEdit);
+    nextEditBtn.addEventListener("click", nextEdit);
     const wordForm = document.getElementById("wordForm");
     const enInput = document.getElementById("enInput");
     const esInput = document.getElementById("esInput");
@@ -368,21 +416,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 function startEdit(id) {
-  const w = words.find(x => x.id === id);
-  if (!w) return;
+const idx = words.findIndex(x => x.id === id);
+if (idx === -1) return;
 
-  editingId = id;
+currentEditIndex = idx;   // ⭐ Guardamos el índice actual
+const w = words[idx];
+
+editingId = id;
+
   enInput.value = w.en;
   esInput.value = w.es;
   pronInput.value = w.pron;
+  // ⭐ Animación suave al cambiar de palabra
+const modal = document.getElementById("addModal"); // o el ID de tu modal
+modal.classList.remove("fade-swap");
+void modal.offsetWidth; // truco para reiniciar animación
+modal.classList.add("fade-swap");
 catChecks.forEach(c => {
   c.checked = w.cats?.includes(c.value);
 });
   formTitle.textContent = "Editar palabra";
   showStatus("Editando. Cambia lo que quieras y pulsa Guardar.", "info");
+  
+  nextEditBtn.classList.remove("hidden");
+  cancelEditBtn.classList.remove("hidden");
+  clearBtn.classList.add("hidden");
+
+  // ⭐ Cambiar texto si es la última palabra
+if (currentEditIndex === words.length - 1) {
+  nextEditBtn.textContent = "Finalizar";
+} else {
+  nextEditBtn.textContent = "Siguiente →";
+}
 
   openAddModal(); // ⭐ ABRIR EL MODAL AQUÍ
-
   enInput.focus();
 }
 
@@ -660,6 +727,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
