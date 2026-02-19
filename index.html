@@ -176,29 +176,27 @@
           class="mt-1 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white soft-ring mono"/>
       </div>
 
-      <div class="sm:col-span-3 flex flex-col sm:flex-row gap-3 mt-2">
-        <button type="submit"
-          class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold">
-          💾 Guardar
-        </button>
+<div class="sm:col-span-3 flex flex-col sm:flex-row gap-3 mt-2">
+  <button type="submit"
+    class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold">
+    💾 Guardar
+  </button>
 
-        <button id="cancelEditBtn" type="button"
-          class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-100 text-amber-950 font-semibold hidden">
-          ✋ Cancelar
-        </button>
+  <button id="cancelEditBtn" type="button"
+    class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-100 text-amber-950 font-semibold hidden">
+    ✋ Cancelar
+  </button>
 
-        <button id="clearBtn" type="button"
-          class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/80 border border-white/60 font-semibold">
-          🧽 Limpiar
-        </button>
-
-        <div id="status"
-          class="flex-1 px-4 py-3 rounded-2xl bg-white/80 border border-white/60 text-slate-800 text-sm hidden">
-        </div>
-      </div>
-    </form>
-  </div>
+  <button id="clearBtn" type="button"
+    class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/80 border border-white/60 font-semibold">
+    🧽 Limpiar
+  </button>
 </div>
+
+<div id="status"
+  class="flex-1 px-4 py-3 rounded-2xl bg-white/80 border border-white/60 text-slate-800 text-sm hidden">
+</div>
+
   
   <script>
     // -----------------------------
@@ -288,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const formTitle = document.getElementById("formTitle");
     const editBadge = document.getElementById("editBadge");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
-
+    cancelEditBtn.addEventListener("click", cancelEdit);
     const wordForm = document.getElementById("wordForm");
     const enInput = document.getElementById("enInput");
     const esInput = document.getElementById("esInput");
@@ -566,7 +564,7 @@ toggleActionsBtn.addEventListener("click", () => {
       enInput.focus();
     });
 
-    cancelEditBtn.addEventListener("click", cancelEdit);
+ 
 
     resultsBody.addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-act]");
@@ -622,6 +620,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
