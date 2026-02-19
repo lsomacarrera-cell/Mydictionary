@@ -62,6 +62,11 @@
           0 palabras
         </span>
 
+        <button id="toggleActionsBtn"
+  class="px-4 py-2 rounded-2xl bg-slate-200 hover:bg-slate-300 font-semibold">
+  Mostrar acciones
+</button>
+
         <button id="exportBtn"
           class="px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm active:scale-[0.99] transition">
           ⬇️ Exportar
@@ -231,6 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const exportBtn = document.getElementById("exportBtn");
     const importFile = document.getElementById("importFile");
     const resetBtn = document.getElementById("resetBtn");
+    
+    let actionsVisible = false;
 
     // -----------------------------
     // CRUD
@@ -323,7 +330,7 @@ function render(){
   resultsBody.innerHTML = "";
 
   const q = norm(searchInput.value);
-  const showActions = list.length > 0;
+const showActions = actionsVisible;
 
   // Texto bajo "Buscar"
   if(!q){
@@ -369,7 +376,7 @@ function render(){
 
     // Ocultar Acciones en modo repaso
     if(!showActions){
-      tr.querySelector(".acciones-col").style.display = "none";
+     tr.querySelector(".acciones-col").style.display = showActions ? "" : "none";
     }
 
     resultsBody.appendChild(tr);
@@ -459,6 +466,14 @@ function render(){
       render();
       hideStatus();
     });
+    
+const toggleActionsBtn = document.getElementById("toggleActionsBtn");
+
+toggleActionsBtn.addEventListener("click", () => {
+  actionsVisible = !actionsVisible;
+  toggleActionsBtn.textContent = actionsVisible ? "Ocultar acciones" : "Mostrar acciones";
+  render();
+});
 
     wordForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -604,6 +619,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
