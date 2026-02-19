@@ -338,31 +338,25 @@ document.addEventListener("DOMContentLoaded", () => {
       saveWords(words);
     }
 
-    function startEdit(id) {
-      const w = words.find(x => x.id === id);
-      if (!w) return;
+function startEdit(id) {
+  const w = words.find(x => x.id === id);
+  if (!w) return;
 
-      editingId = id;
-      enInput.value = w.en;
-      esInput.value = w.es;
-      pronInput.value = w.pron;
+  editingId = id;
+  enInput.value = w.en;
+  esInput.value = w.es;
+  pronInput.value = w.pron;
 
-      formTitle.textContent = "Editar palabra";
-      editBadge.classList.remove("hidden");
-      cancelEditBtn.classList.remove("hidden");
-      showStatus("Editando. Cambia lo que quieras y pulsa Guardar.", "info");
-      enInput.focus();
-    }
+  formTitle.textContent = "Editar palabra";
+  editBadge.classList.remove("hidden");
+  cancelEditBtn.classList.remove("hidden");
+  showStatus("Editando. Cambia lo que quieras y pulsa Guardar.", "info");
 
-    function cancelEdit() {
-      editingId = null;
-      formTitle.textContent = "Añadir palabra";
-      editBadge.classList.add("hidden");
-      cancelEditBtn.classList.add("hidden");
-      wordForm.reset();
-      hideStatus();
-      enInput.focus();
-    }
+  openAddModal(); // ⭐ ABRIR EL MODAL AQUÍ
+
+  enInput.focus();
+}
+
 
     // -----------------------------
     // Search + Render
@@ -619,6 +613,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
