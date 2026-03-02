@@ -489,26 +489,7 @@ function getFiltered(){
     return filtered;
 }
 
-    // Filtro por texto
-    const q = norm(searchInput.value);
-    if(q){
-        filtered = filtered.filter(w =>
-            norm(w.en).includes(q) ||
-            norm(w.es).includes(q) ||
-            norm(w.pron).includes(q)
-        );
-    }
-
-    // ⭐ Filtro por categoría (nuevo)
-    const cat = catFilter.value;
-    if(cat){
-        filtered = filtered.filter(w => w.cats?.includes(cat));
-    }
-
-    return filtered;
-}
-
-
+  
 function render(){
   updateCount();
 
@@ -751,6 +732,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
