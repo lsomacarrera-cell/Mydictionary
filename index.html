@@ -475,6 +475,30 @@ function getFiltered(){
         );
     }
 
+    // Filtro por categoría
+    const cat = catFilter.value;
+    if(cat){
+        filtered = filtered.filter(w => w.cats?.includes(cat));
+    }
+
+    // ⭐ ORDEN ALFABÉTICO POR INGLÉS
+    filtered.sort((a, b) =>
+        a.en.localeCompare(b.en, "en", { sensitivity: "base" })
+    );
+
+    return filtered;
+}
+
+    // Filtro por texto
+    const q = norm(searchInput.value);
+    if(q){
+        filtered = filtered.filter(w =>
+            norm(w.en).includes(q) ||
+            norm(w.es).includes(q) ||
+            norm(w.pron).includes(q)
+        );
+    }
+
     // ⭐ Filtro por categoría (nuevo)
     const cat = catFilter.value;
     if(cat){
@@ -727,6 +751,7 @@ addModal.addEventListener("click", (e) => {
 
 </body>
 </html>
+
 
 
 
