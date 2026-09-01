@@ -556,25 +556,33 @@ const showActions = actionsVisible;
     // -----------------------------
     // Export / Import / Reset
     // -----------------------------
+
+    
     exportBtn.addEventListener("click", () => {
-      const payload = {
-        app: "My dictionary",
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        words
-      };
+  const data = {
+    words: words,
+    exportedAt: new Date().toISOString()
+  };
 
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {
+    type: "application/json"
+  });
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "My dictionary_export.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "diccionario_ingles_espanol.json";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 2000);
+});
 
     importFile.addEventListener("change", async (e) => {
       const file = e.target.files?.[0];
